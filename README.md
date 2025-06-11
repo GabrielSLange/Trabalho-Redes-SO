@@ -1,89 +1,97 @@
 
-# Tutorial de Execução: Scanner de IP em Python
+Abra o terminal (PowerShell ou CMD) no diretório do seu projeto e execute:
 
-Este tutorial guiará você através dos passos para executar o servidor e o cliente do scanner de IP em seu ambiente local usando o Visual Studio Code (VS Code) ou um terminal padrão.
+```powershell
+python -m venv windows
 
-## Pré-requisitos
 
-- Python 3.8 ou superior instalado.
-- Visual Studio Code (opcional, mas recomendado para facilitar a execução e depuração).
-- Os arquivos `ip_scanner_server.py` e `test_client.py` no mesmo diretório do projeto.
 
-## Passo 1: Descobrindo o Endereço IP da Sua Máquina e a Faixa da Rede Local
+# 📡 Tutorial: Executando `ip_scanner_server.py` com ambiente virtual no Windows 10
 
-### No Windows
+Este guia ensina como ativar um ambiente virtual chamado `windows` e executar o script `ip_scanner_server.py`.
 
-1. **Abra o Prompt de Comando:**
-   - Pressione a tecla Windows, digite `cmd` e pressione Enter.
-2. **Execute o comando `ipconfig`:**
-   ```bash
-   ipconfig
-   ```
-3. **Identifique sua Conexão Ativa** e anote:
-   - Endereço IPv4: ex: `192.168.1.105`
-   - Máscara de Sub-rede: ex: `255.255.255.0`
+---
 
-### No Linux
+## ✅ Pré-requisitos
 
-1. **Abra o Terminal**
-2. **Execute o comando:**
-   ```bash
-   ip addr
-   ```
-3. **Anote:**
-   - `inet`: ex: `192.168.1.105/24`
+- Python 3.x instalado no sistema
+- Windows 10
+- Terminal (PowerShell ou CMD)
+- Arquivo `ip_scanner_server.py` salvo no diretório do projeto
+- Ambiente virtual chamado `windows` (se ainda não tiver, veja abaixo como criar)
 
-### Convertendo para Notação CIDR
+---
 
-- Endereço de Rede: se seu IP é `192.168.1.105` e sua máscara é `255.255.255.0`, o endereço de rede geralmente é `192.168.1.0`.
-- Prefixo CIDR:
-  - `255.255.255.0` → `/24`
-  - `255.255.0.0` → `/16`
-- Exemplo: `192.168.1.0/24`
+## 📁 Passo 1 – Criar o ambiente virtual (se ainda não existir)
 
-## Passo 2: Executando o Servidor (`ip_scanner_server.py`)
+Abra o PowerShell ou CMD no diretório do seu projeto e execute:
 
-### Usando o VS Code
+```powershell
+python -m venv windows
+```
 
-```bash
+Isso criará uma pasta chamada `windows/` com o ambiente virtual.
+
+---
+
+## ⚙️ Passo 2 – Ativar o ambiente virtual
+
+### ▶ PowerShell:
+
+```powershell
+.\windows\Scripts\activate
+```
+
+#### 🛑 Se aparecer erro de permissão:
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+```
+
+Depois, execute novamente:
+
+```powershell
+.\windows\Scripts\activate
+```
+
+---
+
+### ▶ CMD (Prompt de Comando):
+
+```cmd
+windows\Scripts\activate
+```
+
+---
+
+## 🚀 Passo 3 – Executar o servidor
+
+Com o ambiente virtual ativo, execute:
+
+```powershell
 python ip_scanner_server.py
 ```
 
-Você verá algo como: `[INFO] Servidor esta escutando em 0.0.0.0:35640`
+Se tudo estiver correto, você verá algo como:
 
-### Usando um Terminal Padrão
-
-```bash
-cd caminho/para/seu/projeto
-python ip_scanner_server.py
+```
+[INFO] Servidor esta escutando em 0.0.0.0:35640
 ```
 
-## Passo 3: Executando o Cliente (`test_client.py`)
+---
 
-### No VS Code
+## ❌ Passo 4 – Encerrar o ambiente virtual
 
-```bash
-python test_client.py
+Para sair do ambiente virtual:
+
+```powershell
+deactivate
 ```
 
-- Digite a faixa CIDR quando solicitado, ex: `192.168.1.0/24`.
+---
 
-### No Terminal Padrão
-
-```bash
-python test_client.py
+```powershell
+python --version
 ```
 
-## Testando Múltiplos Clientes
-
-- Mantenha o servidor em execução.
-- Em múltiplos terminais, execute:
-
-```bash
-python test_client.py
-```
-
-## Encerrando a Aplicação
-
-- Para parar o cliente: ele encerra automaticamente.
-- Para parar o servidor: `Ctrl + C` no terminal onde ele está rodando.
+---

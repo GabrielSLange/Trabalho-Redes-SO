@@ -93,7 +93,14 @@ def handle_client(conn, addr):
         print(f"[{addr}] Recebido CIDR: {cidr_request}, Comunidade SNMP: {community_string_client}")
 
         try:
+            # Valida a CIDR antes de enviar o ACK
             network = ipaddress.ip_network(cidr_request, strict=False) # [2, 3]
+            
+            # --- CORREÇÃO: ENVIAR ACK ANTES DA TAREFA LONGA ---
+            ack_message = f"ACK: Requisicao para {cidr_request} recebida. Iniciando varredura...\n"
+            conn.sendall(ack_message.encode('utf-8')) # [4, 5, 6]
+            # ----------------------------------------------------
+
             print(f"[{addr}] Processando {network.num_addresses} IPs na rede {cidr_request}...")
 
             for ip_obj in network.hosts(): # [2]
@@ -110,7 +117,7 @@ def handle_client(conn, addr):
                     print(f"[{addr}] Dispositivo Ativo (SNMP): {snmp_result}")
                     active_devices_info.append(snmp_result)
                 else:
-                    if ping_ip(ip_str): # [4, 5]
+                    if ping_ip(ip_str): # [7, 8]
                         print(f"[{addr}] Dispositivo Ativo (Ping): {ip_str}")
                         active_devices_info.append(f"{ip_str} (Ping)")
 
@@ -119,17 +126,15 @@ def handle_client(conn, addr):
             else:
                 response_data = "\n".join(active_devices_info) + "\n"
             
-            conn.sendall(response_data.encode('utf-8')) # [6, 7, 8]
-            print(f"[{addr}] Resposta enviada com {len(active_devices_info)} dispositivos ativos.")
+            conn.sendall(response_data.encode('utf-8'))
+            print(f"[{addr}] Resposta final enviada com {len(active_devices_info)} dispositivos ativos.")
 
         except ValueError: # [2, 9, 10]
             error_msg = f"Erro: CIDR '{cidr_request}' invalido.\n"
             print(f"[{addr}] {error_msg.strip()}")
             conn.sendall(error_msg.encode('utf-8'))
         except Exception as e:
-            error_msg = f"Erro no servidor ao processar sua requisicao: {e}\n"
             print(f"[{addr}] Erro inesperado: {e}")
-            conn.sendall(error_msg.encode('utf-8'))
 
     except socket.error as e:
         print(f" Erro de socket com {addr}: {e}")
@@ -137,22 +142,22 @@ def handle_client(conn, addr):
         print(f" Erro ao lidar com {addr}: {e}")
     finally:
         print(f" Conexao com {addr} fechada.")
-        conn.close() # [6, 7]
+        conn.close() # [4, 5]
 
 def start_server():
     """
     Inicia o servidor TCP multithread.
     """
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # [6, 7]
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # [4, 5]
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) 
     
     try:
-        server_socket.bind((HOST, PORT)) # [6, 7]
-        server_socket.listen() # [6, 7]
+        server_socket.bind((HOST, PORT)) # [4, 5]
+        server_socket.listen() # [4, 5]
         print(f"[INFO] Servidor esta escutando em {HOST}:{PORT}")
 
         while True:
-            conn, addr = server_socket.accept() # [6, 7]
+            conn, addr = server_socket.accept() # [4, 5]
             client_thread = threading.Thread(target=handle_client, args=(conn, addr)) # [1, 11]
             client_thread.daemon = True 
             client_thread.start()
